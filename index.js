@@ -3,15 +3,14 @@ const buildUrl = require("./lib/buildUrl")
 const makeRequest = require("./lib/makeReq")
 
 function collector(config, accum = []) {
-	const output = Object.assign(() => {}, { accum })
-	return new Proxy(output, {
-		get(target, prop) {
-			return collector(config, target.accum.concat(prop))
-		},
-		apply(target, _, args) {
-			return config.client
-				? makeRequest(target, config, ...args)
-				: buildUrl(target.accum, config, args[0]).url
+	function finalize(...args) {
+		return config.client
+			? makeRequest(accum, config, ...args)
+			: buildUrl(accum, config, ...args).url
+	}
+	return new Proxy(finalize, {
+		get(_, prop) {
+			return collector(config, accum.concat(prop))
 		},
 	})
 }
