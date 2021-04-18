@@ -1,12 +1,13 @@
 const e = require("./lib/errors")
+const { END } = require("./lib/symbols")
 const buildUrl = require("./lib/buildUrl")
 const makeRequest = require("./lib/makeReq")
 
 function collector(config, accum = []) {
-	function finalize(...args) {
+	function finalize(firstArg, secondArg) {
 		return config.client
-			? makeRequest(accum, config, ...args)
-			: buildUrl(accum, config, ...args).url
+			? makeRequest(accum, config, firstArg, secondArg)
+			: buildUrl(accum, config, firstArg, secondArg, END).url
 	}
 	return new Proxy(finalize, {
 		get(_, prop) {
