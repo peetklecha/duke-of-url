@@ -226,7 +226,7 @@ const myApi = urlMaker({
 
 ```
 
-All of this works the same with `reqMaker`, except that the `END` symbol can be replaced by the method symbols `GET`, `PUT`, `POST`, and `DELETE`. Using `END` indicates that a specific endpoint (and query/body validation) applies to any method. Query validators on `PUT` and `POST` routes will be applied to the payload, i.e., the request body instead of the query.
+All of this works the same with `reqMaker`, except that the `END` symbol can be replaced by the method symbols `GET`, `PUT`, `POST`, and `DELETE`. Using `END` indicates that a specific endpoint (and query/body validation) applies to any method. Validators on `PUT` and `POST` routes will be applied to the payload, i.e., the request body instead of the query.
 
 If a route should support both queries and request bodies, and we want distinct validators for both, this can be done like in this example:
 
