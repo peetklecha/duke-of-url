@@ -84,6 +84,8 @@ const api2 = urlMaker({
 	},
 })
 
+const noValidations = urlMaker()
+
 describe("urlMaker", () => {
 	it("produces correct URLs", () => {
 		expect(shopify.customers[2398840923]({ fields: "hello" })).toBe(
@@ -106,6 +108,9 @@ describe("urlMaker", () => {
 			"/branch-one/branch-two?auth=1234"
 		)
 		expect(api2.branchThree()).toBe("/branch3")
+		expect(noValidations.one.two.three({ four: 5 })).toBe(
+			"/one/two/three?four=5"
+		)
 	})
 	it("errors properly", () => {
 		expect.assertions(4)
