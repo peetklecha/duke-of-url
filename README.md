@@ -10,7 +10,7 @@ to instead be written as:
 
 Or, by wrapping an HTTP client like Axios, you can replace this:
 
-`axios.get(https://my-store.shopify.com/admin/api/2020-10/customers/23849823/orders.json?processed_at_min=2021-09-05)`
+`axios.get('https://my-store.shopify.com/admin/api/2020-10/customers/23849823/orders.json?processed_at_min=2021-09-05')`
 
 With this:
 
