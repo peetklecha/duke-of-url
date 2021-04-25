@@ -198,7 +198,7 @@ const myApi = urlMaker({
 			puppies: true,
 		},
 		dolphins: {
-			[VALUE]: "odontoceti/delphinidae",
+			[FORMAT]: "odontoceti/delphinidae",
 			[END]: true,
 			[PARAM]: true,
 		},
