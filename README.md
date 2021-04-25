@@ -51,7 +51,7 @@ console.log(
 //logs: "https://my-store.shopify.com/admin/api/2020-10/customers/23849823/orders.json?processed_at_min=2021-09-05"
 ```
 
-Note that by default there are no validations -- any sequence of properties can be chained from the proxy returned by `urlMaker`, and any keys and values can be passed included in the payload. Validations can be added to the config object, however -- see below.
+Note that by default there are no validations -- any sequence of properties can be chained from the proxy returned by `urlMaker`, and any keys and values can be included in the payload. Validations can be added to the config object, however -- see below.
 
 A route formatting function can also be included in the config. For example, if all routes should be converted to kebab-case from camelCase during url construction.
 
