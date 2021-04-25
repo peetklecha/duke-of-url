@@ -1,2 +1,4 @@
 .gitignore
 index.spec.js
+node_modules
+scrap
