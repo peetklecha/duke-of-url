@@ -18,14 +18,14 @@ function collector(config, accum = []) {
 
 module.exports = {
 	...require("./lib/symbols"),
-	reqMaker(_config) {
-		const config = { ..._config }
-		if (!config.client) throw e.noClient()
-		return collector(config)
+	reqMaker(config) {
+		const _config = { ...config }
+		if (!_config.client) throw e.noClient()
+		return collector(_config)
 	},
-	urlMaker(_config) {
-		const config = { ..._config }
-		delete config.client
-		return collector(config)
+	urlMaker(config) {
+		const _config = { ...config }
+		delete _config.client
+		return collector(_config)
 	},
 }

@@ -1,14 +1,14 @@
 {
-  "name": "duke-of-url",
-  "version": "1.0.0",
-  "description": "A library making URLs and/or HTTP requests.",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "author": "Peet Klecha",
-  "license": "ISC",
-  "devDependencies": {
-    "jest": "^26.6.3"
-  }
+	"name": "duke-of-url",
+	"version": "1.1.0",
+	"description": "A library for making URLs and/or HTTP requests.",
+	"main": "index.js",
+	"scripts": {
+		"test": "jest"
+	},
+	"author": "Peet Klecha",
+	"license": "ISC",
+	"devDependencies": {
+		"jest": "^26.6.3"
+	}
 }

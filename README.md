@@ -213,13 +213,15 @@ Query validations can be provided as well. One way to do this is by providing a 
 
 ```js
 const myApi = urlMaker({
-		api: {
+	api: {
 		chihuahuas: myChihuahuaQueryValidator //custom validating function
 		dolphins: ["color", "name", "age"], //array of permissible keys; any values allowed
 		eagles: {
-			color: ["white", "gold", "red"], //key with array of permissible values
-			name: true, //key with any value allowed
-			age: Number.isFinite //key with validating function for values
+			[END]: {
+				color: ["white", "gold", "red"], //key with array of permissible values
+				name: true, //key with any value allowed
+				age: Number.isFinite //key with validating function for values
+			}
 		}
 	}
 })
@@ -262,8 +264,8 @@ const myApi = reqMaker({
 				[QUERY]: false,
 				[BODY]: true,
 			},
-			[PUT]: {
-				[PARAM]: {
+			[PARAM]: {
+				[PUT]: {
 					[BODY]: false,
 					[QUERY]: true,
 				},
