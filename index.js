@@ -4,9 +4,9 @@ const buildUrl = require("./lib/buildUrl")
 const makeRequest = require("./lib/makeReq")
 
 function collector(config, accum = []) {
-	function finalize(firstArg, secondArg) {
+	function finalize(firstArg, secondArg, ...args) {
 		return config.client
-			? makeRequest(accum, config, firstArg, secondArg)
+			? makeRequest(accum, config, firstArg, secondArg, ...args)
 			: buildUrl(accum, config, firstArg, secondArg, END).url
 	}
 	return new Proxy(finalize, {

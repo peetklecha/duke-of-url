@@ -36,16 +36,16 @@ interface UrlMakerConfig<ApiType extends Api> extends UrlMakerConfigWithoutApi {
 	api: ApiType,
 }
 
-interface ReqMakerConfigWithoutApi<Response> extends UrlMakerConfigWithoutApi {
+interface ReqMakerConfig<Response> extends UrlMakerConfigWithoutApi {
 	responseFormat?: (res: Promise<Response>) => unknown,
 	bodyFormat?: (raw: unknown) => unknown,
 	client: Client<Response>
 }
 
-interface ReqMakerConfig<
+interface ReqMakerConfigWithApi<
 	ApiType extends ApiWithMethods,
 	Response,
-	> extends ReqMakerConfigWithoutApi<Response> {
+	> extends ReqMakerConfig<Response> {
 	api: ApiType
 }
 
@@ -85,7 +85,7 @@ interface ApiWithMethods {
 	[FORMAT]?: string | ((str: string) => string)
 }
 
-type ApiWithMethodsAtEndpoint = ApiWithMethods & (
+export type ApiWithMethodsAtEndpoint = ApiWithMethods & (
 	| { [GET]: PayloadValidator }
 	| { [PUT]: PayloadValidator }
 	| { [POST]: PayloadValidator }
@@ -99,7 +99,7 @@ type ValidPayload<T extends QueryValidator> = T extends true
 	: T extends PayloadValidatorFunction
 	? any
 	: T extends PayloadValidatorObject
-	? { [Property in keyof T]: any }
+	? { [Property in keyof T as Property extends string ? Property : never]?: any }
 	: any
 
 type Endpoint<T extends QueryValidator> = (
@@ -120,10 +120,10 @@ type UrlMaker<ApiType> = {
 	: Property extends string
 	? Property
 	: never
-	]: ApiType[Property] extends QueryValidator
-	? Endpoint<ApiType[Property]>
-	: ApiType[Property] extends ApiAtEndpoint
+	]: ApiType[Property] extends ApiAtEndpoint
 	? Endpoint<ApiType[Property][EndSymbol]> & UrlMaker<ApiType[Property]>
+	: ApiType[Property] extends QueryValidator
+	? Endpoint<ApiType[Property]>
 	: UrlMaker<ApiType[Property]>
 }
 
@@ -153,14 +153,14 @@ type ReqMakerEndpoint<
 			: unknown
 			: unknown,
 		...extraArgs: unknown[],
-	) => Promise<Response>;
+	) => Response;
 
-type ReqMakerMidpoint<Method extends MethodSymbol, Response, T> = T extends ApiWithMethodsAtEndpoint
+export type ReqMakerMidpoint<Method extends MethodSymbol, Response, T> = T extends ApiWithMethodsAtEndpoint
 	? T extends { [MethSymb in Method]: any }
 	? ReqMakerEndpoint<Method, T[Method], Response>
-	& ReqMakerWithMethod<Method, Response, T>
+	& ReqMakerNonTerminal<Method, Response, T>
 	: never
-	: ReqMakerWithMethod<Method, Response, T>
+	: ReqMakerNonTerminal<Method, Response, T>
 
 interface ReqMakerMidpointWithoutApi<Method extends MethodSymbol, Response> extends ReqMakerEndpoint<Method, true, Response> {
 	[key: string]: ReqMakerMidpointWithoutApi<Method, Response>
@@ -180,7 +180,7 @@ type ReqMaker<Response, ApiType> = {
 	delete: ReqMakerMidpoint<typeof DELETE, Response, ApiType>
 }
 
-type ReqMakerWithMethod<Method extends MethodSymbol, Response, ApiType> = {
+type ReqMakerNonTerminal<Method extends MethodSymbol, Response, ApiType> = {
 	[
 	Property
 	in keyof ApiType
@@ -198,11 +198,11 @@ declare function urlMaker(config?: UrlMakerConfigWithoutApi): UrlMakerWithoutApi
 declare function reqMaker<
 	Response,
 	ApiType extends ApiWithMethods,
-	>(config: ReqMakerConfig<ApiType, Response>): ReqMaker<Response, ApiType>
+	>(config: ReqMakerConfigWithApi<ApiType, Response>): ReqMaker<Response, ApiType>
 
 declare function reqMaker<
 	Response,
-	>(config: ReqMakerConfigWithoutApi<Response>): ReqMakerWithoutApi<Response>
+	>(config: ReqMakerConfig<Response>): ReqMakerWithoutApi<Response>
 
 
 export { urlMaker, reqMaker, GET, PUT, POST, DELETE, END, PARAM, FORMAT }

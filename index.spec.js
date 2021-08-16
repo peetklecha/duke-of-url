@@ -145,13 +145,14 @@ describe("urlMaker", () => {
 	})
 })
 
-const fakeClientFunc = method => (url, body) => ({ method, url, body })
+const fakeClientFuncGetDel = method => (url, config) => ({ method, url, config })
+const fakeClientFuncPutPost = method => (url, body, config) => ({ method, url, body, config })
 
 const fakeClient = {
-	get: fakeClientFunc("get"),
-	put: fakeClientFunc("put"),
-	post: fakeClientFunc("post"),
-	delete: fakeClientFunc("delete"),
+	get: fakeClientFuncGetDel("get"),
+	put: fakeClientFuncPutPost("put"),
+	post: fakeClientFuncPutPost("post"),
+	delete: fakeClientFuncGetDel("delete"),
 }
 
 const shopify2 = reqMaker({
@@ -248,5 +249,22 @@ describe("reqMaker", () => {
 				"URLValidationError: Method PUT not supported at http://wine-store.myshopify.com/admin/api/2020-10/customers.json"
 			)
 		}
+	})
+	it("passes config in correctly", () => {
+		const res1 = shopify2.get.customers[2398840923]({ fields: "hello" }, undefined, { auth: "sudo" })
+		expect(res1.method).toBe("get")
+		expect(res1.url).toBe(
+			"http://wine-store.myshopify.com/admin/api/2020-10/customers/2398840923.json?fields=hello"
+		)
+		expect(res1.config.auth).toBe("sudo")
+		const body4 = { key: "value" }
+		const config4 = { auth: "sudo" }
+		const res4 = shopify2.post.customers(body4, undefined, config4)
+		expect(res4.method).toBe("post")
+		expect(res4.url).toBe(
+			"http://wine-store.myshopify.com/admin/api/2020-10/customers.json"
+		)
+		expect(res4.body).toBe(body4)
+		expect(res4.config).toBe(config4)
 	})
 })

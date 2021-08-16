@@ -93,7 +93,7 @@ async function main() {
 }
 ```
 
-Note that payloads are automatically formatted as queries for GET and DELETE, but for POST or PUT they are treated as request bodies and passed in as the second argument to the request client. A second argument can be supplied which will be formatted into a query for POST or PUT routes, or passed into the client unformatted for GET or DELETE routes.
+Note that payloads are automatically formatted as queries for GET and DELETE, but for POST or PUT they are treated as request bodies and passed in as the second argument to the request client. A second argument can be supplied which will be formatted into a query for POST or PUT routes, or passed into the client unformatted for GET or DELETE routes. Note that any subsequent arguments after the first two will be passed directly into the client.
 
 ```js
 const myApi = reqMaker({ client: axios })
@@ -124,7 +124,7 @@ async function main() {
 }
 ```
 
-Automatic logging of the outbound URL can also be enabled by adding the property `log` to the config with a value of `true`.
+Automatic logging of the outbound URL can also be enabled by adding the property `log` to the config with a value of `true`. A function of type `string => string` can also be provided as the value of `log`; the outbound URL will be passed into this function, and the output will be `console.log`ed.
 
 ## Validations
 
@@ -209,7 +209,7 @@ const myApi = urlMaker({
 myApi.dolphins[92834809238]() //=== "/odontoceti/delphinidae/92834809238"
 ```
 
-Query validations can be provided as well. One way to do this is by providing a customer query validating function; this will apply before stringification of the query object. Alternately, an array of valid query keys can be provided; any value will be accepted for valid keys. Third, a an object can be provided whose keys correspond to valid query keys, and whose values can either be `true` (any value permitted), an array of permissible values, or a validating function.
+Query validations can be provided as well. One way to do this is by providing a custom query validating function; this will apply before stringification of the query object. Alternately, an array of valid query keys can be provided; any value will be accepted for valid keys. Third, a an object can be provided whose keys correspond to valid query keys, and whose values can either be `true` (any value permitted), an array of permissible values, or a validating function.
 
 ```js
 const myApi = urlMaker({
@@ -221,14 +221,16 @@ const myApi = urlMaker({
 				color: ["white", "gold", "red"], //key with array of permissible values
 				name: true, //key with any value allowed
 				age: Number.isFinite //key with validating function for values
-			}
+			} // no other keys permitted
 		}
 	}
 })
 
 ```
 
-All of this works the same with `reqMaker`, except that the `END` symbol can be replaced by the method symbols `GET`, `PUT`, `POST`, and `DELETE`. Using `END` indicates that a specific endpoint (and query/body validation) applies to any method. Validators on `PUT` and `POST` routes will be applied to the payload, i.e., the request body instead of the query.
+Note that when using an object of key/validator pairs as a query validator, this must be nested under the `[END]` symbol to distinguish the query validation from a description of further endpoints.
+
+All of this works the same with `reqMaker`, except that the `END` symbol should be replaced by the method symbols `GET`, `PUT`, `POST`, and `DELETE`.  Validators on `PUT` and `POST` routes will be applied to the payload, i.e., the request body instead of the query.
 
 If a route should support both queries and request bodies, and we want distinct validators for both, this can be done like in this example:
 
@@ -279,3 +281,90 @@ myApi.get.users({ id: 47 })
 myApi.put.users[47]({ name: "fred" })
 // === myClient.put("/users/47?name=fred")
 ```
+
+When passing extra args to a put or post endpoint (or a get/delete endpoint with queries disabled and bodies enabled), there is a small subtle distinction between the extra args and the body.
+
+```js
+const myClient = reqMaker({
+	client: axios,
+})
+
+myClient.get.some.end.point({}, { auth })
+// === axios.post('/some/end/point', { auth })
+
+myClient.get.some.end.point({}, undefined, { auth })
+// === axios.post('/some/end/point', { auth })
+
+```
+
+In the first case above, `{ auth }` is considered a 'body', whereas in the second case it is considered an extra argument. Because the body is left explicitly undefined in the second case, this works out the same. But there is a small difference: Only in the first case would the extra argument be passed through the `bodyFormat` func, if provided.
+
+```js
+const myClient = reqMaker({
+	client: axios,
+	bodyFormat: body => ({ ...body, brandId })
+})
+
+myClient.get.some.end.point({}, { auth })
+// === axios.get('/some/end/point', { auth, brandId })
+
+myClient.get.some.end.point({}, undefined, { auth })
+// === axios.get('/some/end/point', { auth })
+
+```
+
+## Typescript
+
+Type information is now provided by the library. If you provide an explicit API, your IDE should lint your code appropriately.
+
+```js
+const shopify = urlMaker({
+	api: {
+		customers: {
+			[END]: {
+				ids: areIds,
+				since_id: isId,
+				created_at_min: true,
+				created_at_max: true,
+				updated_at_min: true,
+				updated_at_max: true,
+				limit: isLimit,
+				fields: true,
+			},
+			find: {
+				[FORMAT]: "search",
+				[END]: ["query"],
+			},
+			[PARAM]: {
+				[END]: ["fields"],
+				account_activation_url: false,
+				send_invite: false,
+				orders: true,
+			},
+			count: false,
+		},
+	},
+})
+
+console.log(shopify.customers({ ids: ['a', 'b'], other: 'hi' }));
+//                                               ~~~~~~~~~~~ "Object literal may only specify known properties, and 'other' does not exist in type..."
+console.log(shopify.customers[347].orders());
+//                                 ~~~~~~ "Property 'orders' does not exist on type 'Endpoint<{ [END]: string[]; account_activation_url: false; send_invite: false; orders: true; }>'"
+```
+
+There are a few caveats, though. First of all, Typescript can't provide type checking on query/body values, and it cannot validate query keys that are listed using the array-of-valid-keys method (since the content of an array value is not statically determinable). So it will always type the values of queries and bodies as `any`.
+
+Second, while it would be nice for reqMaker to automatically infer the type of responses based on the response type of the client passed into the reqMaker config, this doesn't seem to be possible, at least not with Axios, given the specific way that Axios's types are configured. So you'll need to declare the response type when you invoke reqMaker by passing it in as a type parameter. Additionally, because Typescript does not currently support partial type parameter inference, you'll need to explicitly specify the type of your API if you are specifying one.
+
+```js
+//with API specified
+const config = { api: { ... } }
+
+const api = reqMaker<AxiosPromise, typeof config.api>(config)
+
+//no API specified, config inline
+const api = reqMaker<AxiosPromise>({ ... })
+```
+
+It should be possible to infer types automatically if you use `responseFormat`, but this has not yet been implemented, so for now you should simply pass in the return type of `responseFormat` if you are using it.
+
