@@ -171,6 +171,10 @@ type ReqMakerWithoutApi<Response> = {
 	put: ReqMakerMidpointWithoutApi<typeof PUT, Response>
 	post: ReqMakerMidpointWithoutApi<typeof POST, Response>
 	delete: ReqMakerMidpointWithoutApi<typeof DELETE, Response>
+	GET: ReqMakerMidpointWithoutApi<typeof GET, Response>
+	PUT: ReqMakerMidpointWithoutApi<typeof PUT, Response>
+	POST: ReqMakerMidpointWithoutApi<typeof POST, Response>
+	DELETE: ReqMakerMidpointWithoutApi<typeof DELETE, Response>
 }
 
 type ReqMaker<Response, ApiType> = {
@@ -178,6 +182,10 @@ type ReqMaker<Response, ApiType> = {
 	put: ReqMakerMidpoint<typeof PUT, Response, ApiType>
 	post: ReqMakerMidpoint<typeof POST, Response, ApiType>
 	delete: ReqMakerMidpoint<typeof DELETE, Response, ApiType>
+	GET: ReqMakerMidpoint<typeof GET, Response, ApiType>
+	PUT: ReqMakerMidpoint<typeof PUT, Response, ApiType>
+	POST: ReqMakerMidpoint<typeof POST, Response, ApiType>
+	DELETE: ReqMakerMidpoint<typeof DELETE, Response, ApiType>
 }
 
 type ReqMakerNonTerminal<Method extends MethodSymbol, Response, ApiType> = {

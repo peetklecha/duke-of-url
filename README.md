@@ -93,6 +93,12 @@ async function main() {
 }
 ```
 
+Methods can also be all caps.
+
+```js
+await shopify.GET.customers[23849823].orders()
+```
+
 Note that payloads are automatically formatted as queries for GET and DELETE, but for POST or PUT they are treated as request bodies and passed in as the second argument to the request client. A second argument can be supplied which will be formatted into a query for POST or PUT routes, or passed into the client unformatted for GET or DELETE routes. Note that any subsequent arguments after the first two will be passed directly into the client.
 
 ```js
