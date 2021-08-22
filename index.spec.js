@@ -239,6 +239,12 @@ describe("reqMaker", () => {
 			"http://wine-store.myshopify.com/admin/api/2020-10/other-thing.json?since_id=47"
 		)
 		expect(res5.body).toBe(undefined)
+		const res6 = shopify2.GET.customers[2398840923]({ fields: "hello" })
+		expect(res6.method).toBe("get")
+		expect(res6.url).toBe(
+			"http://wine-store.myshopify.com/admin/api/2020-10/customers/2398840923.json?fields=hello"
+		)
+		expect(res6.body).toBe(undefined)
 	})
 	it("errors properly", () => {
 		expect.assertions(1)
