@@ -92,14 +92,23 @@ export type ApiWithMethodsAtEndpoint = ApiWithMethods & (
 	| { [DELETE]: PayloadValidator }
 )
 
+type Guard<T> = (input: any) => input is T
+
 type ValidPayload<T extends QueryValidator> = T extends true
 	? any
 	: T extends false
 	? never
+	: T extends Guard<infer U>
+	? U
 	: T extends PayloadValidatorFunction
 	? any
 	: T extends PayloadValidatorObject
-	? { [Property in keyof T as Property extends string ? Property : never]?: any }
+	? { [
+		Property in keyof T
+		as Property extends string
+		? Property
+		: never
+		]?: T[Property] extends Guard<infer U> ? U : any }
 	: any
 
 type Endpoint<T extends QueryValidator> = (

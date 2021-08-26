@@ -324,6 +324,12 @@ myClient.get.some.end.point({}, undefined, { auth })
 Type information is now provided by the library. If you provide an explicit API, your IDE should lint your code appropriately.
 
 ```js
+function isLimit(value: unknown): value is number {
+	if (value == null) return false
+	const num = parseInt(value.toString())
+	return !Number.isNaN(num) && num > 0 && num <= 250
+}
+
 const shopify = urlMaker({
 	api: {
 		customers: {
@@ -351,14 +357,17 @@ const shopify = urlMaker({
 		},
 	},
 })
-
+console.log(shopify.customers({ limit: 'none' }));
+//                              ~~~~~~ Type 'string' is not assignable to type 'number'.
 console.log(shopify.customers({ ids: ['a', 'b'], other: 'hi' }));
 //                                               ~~~~~~~~~~~ "Object literal may only specify known properties, and 'other' does not exist in type..."
 console.log(shopify.customers[347].orders());
 //                                 ~~~~~~ "Property 'orders' does not exist on type 'Endpoint<{ [END]: string[]; account_activation_url: false; send_invite: false; orders: true; }>'"
 ```
 
-There are a few caveats, though. First of all, Typescript can't provide type checking on query/body values, and it cannot validate query keys that are listed using the array-of-valid-keys method (since the content of an array value is not statically determinable). So it will always type the values of queries and bodies as `any`.
+Note that if you provide validating functions for individual payload attributes, and you make these functions type guards (e.g., `value is number` as seen in `isLimit` above), then Duke of URL's typings will apply it to the payload in relevant cases.
+
+There are a few caveats, though. First of all, Typescript can't validate query keys that are listed using the array-of-valid-keys method (since the content of an array value is not statically determinable). So it will always type the values of queries and bodies as `any` unless a type guard validating function is used.
 
 Second, while it would be nice for reqMaker to automatically infer the type of responses based on the response type of the client passed into the reqMaker config, this doesn't seem to be possible, at least not with Axios, given the specific way that Axios's types are configured. So you'll need to declare the response type when you invoke reqMaker by passing it in as a type parameter. Additionally, because Typescript does not currently support partial type parameter inference, you'll need to explicitly specify the type of your API if you are specifying one.
 
