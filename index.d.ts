@@ -1,12 +1,12 @@
-declare export const PARAM: unique symbol;
-declare export const GET: unique symbol;
-declare export const PUT: unique symbol;
-declare export const POST: unique symbol;
-declare export const DELETE: unique symbol;
-declare export const END: unique symbol;
-declare export const FORMAT: unique symbol;
-declare export const QUERY: unique symbol;
-declare export const BODY: unique symbol;
+export declare const PARAM: unique symbol;
+export declare const GET: unique symbol;
+export declare const PUT: unique symbol;
+export declare const POST: unique symbol;
+export declare const DELETE: unique symbol;
+export declare const END: unique symbol;
+export declare const FORMAT: unique symbol;
+export declare const QUERY: unique symbol;
+export declare const BODY: unique symbol;
 
 type ParamSymbol = typeof PARAM;
 type EndSymbol = typeof END;
@@ -39,7 +39,7 @@ interface UrlMakerConfig<ApiType extends Api> extends UrlMakerConfigWithoutApi {
 interface ReqMakerConfig<Response> extends UrlMakerConfigWithoutApi {
 	responseFormat?: (res: Promise<Response>) => unknown,
 	bodyFormat?: (raw: unknown) => unknown,
-	client: Client<Response>
+	client: Client
 }
 
 interface ReqMakerConfigWithApi<
@@ -222,5 +222,5 @@ declare function reqMaker<
 	>(config: ReqMakerConfig<Response>): ReqMakerWithoutApi<Response>
 
 
-export { urlMaker, reqMaker, GET, PUT, POST, DELETE, END, PARAM, FORMAT }
+export { urlMaker, reqMaker }
 
