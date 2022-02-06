@@ -166,9 +166,9 @@ type ReqMakerEndpoint<
 
 export type ReqMakerMidpoint<Method extends MethodSymbol, Response, T> = T extends ApiWithMethodsAtEndpoint
 	? T extends { [MethSymb in Method]: any }
-	? ReqMakerEndpoint<Method, T[Method], Response>
-	& ReqMakerNonTerminal<Method, Response, T>
-	: never
+		? ReqMakerEndpoint<Method, T[Method], Response>
+		& ReqMakerNonTerminal<Method, Response, T>
+		: ReqMakerNonTerminal<Method, Response, T>
 	: ReqMakerNonTerminal<Method, Response, T>
 
 interface ReqMakerMidpointWithoutApi<Method extends MethodSymbol, Response> extends ReqMakerEndpoint<Method, true, Response> {
