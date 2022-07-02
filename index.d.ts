@@ -14,8 +14,8 @@ type IntransitiveSymbol = typeof GET | typeof DELETE;
 type TransitiveSymbol = typeof PUT | typeof POST;
 type MethodSymbol = IntransitiveSymbol | TransitiveSymbol;
 
-type Intransitive = (url: string, ...args: unknown[]) => unknown
-type Transitive = (url: string, body: any, ...args: unknown[]) => unknown
+type Intransitive = (url: string, ...args: any[]) => any
+type Transitive = (url: string, body: any, ...args: any[]) => any
 
 interface Client {
 	get: Intransitive,
@@ -170,6 +170,12 @@ export type ReqMakerMidpoint<Method extends MethodSymbol, Response, T> = T exten
 		& ReqMakerNonTerminal<Method, Response, T>
 		: ReqMakerNonTerminal<Method, Response, T>
 	: ReqMakerNonTerminal<Method, Response, T>
+// export type ReqMakerMidpoint<Method extends MethodSymbol, Response, T> = T extends Contains<{ [MethSymb in Method]: any }>
+// 		? T extends { [MethSymb in Method]: any }
+// 			? ReqMakerEndpoint<Method, T[Method], Response>
+// 				& ReqMakerNonTerminal<Method, Response, T>
+// 			: ReqMakerNonTerminal<Method, Response, T>
+// 		: never
 
 interface ReqMakerMidpointWithoutApi<Method extends MethodSymbol, Response> extends ReqMakerEndpoint<Method, true, Response> {
 	[key: string]: ReqMakerMidpointWithoutApi<Method, Response>
