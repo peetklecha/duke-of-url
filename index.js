@@ -7,7 +7,7 @@ function collector(config, accum = []) {
 	function finalize(firstArg, secondArg, ...args) {
 		return config.client
 			? makeRequest(accum, config, firstArg, secondArg, ...args)
-			: buildUrl(accum, config, firstArg, secondArg, END).url
+			: buildUrl(accum, config, END, firstArg, secondArg, ...args).url
 	}
 	return new Proxy(finalize, {
 		get(_, prop) {

@@ -29,6 +29,7 @@ interface UrlMakerConfigWithoutApi {
 	tail?: string,
 	routeFormat?: (str: string) => string,
 	queryFormat?: (raw: object) => object,
+  argInterceptor?: (...args: unknown[]) => { body: unknown, query: unknown, rest: unknown[] },
 	log?: ((str: string) => string) | boolean
 }
 
